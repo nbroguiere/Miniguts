@@ -1,0 +1,142 @@
+Gene	Category	"FAE/M-cell markers (0=no, 1=negativemarker 2=closely related to a known M-cell function/marker, 3=Reported Marker). "	"RSC markers (0 no, 2 similar to a marker or attributed function, 3 yes)"	Injury induced fetal-like tissue	Comment (from GeneCards and Uniprot unless a reference is indicated)
+Cav1	Caveolae	3	0	0	"Caveolin. Essential component of caveolar membranes. Links integrins to EGF signaling. Sends TGFb receptors for degradation. Recruits b-catenin to the membrane, inhibiting wnt signaling. M-cell marker, Lim 2009. "
+Cav2	Caveolae	2	0	0	Other caveolar membrane components
+Cavin1	Caveolae	2	0	0	Other caveolar membrane components
+Cavin3	Caveolae	2	0	0	Other caveolar membrane components
+Cldn4	TJ	3	0	0	"Claudin-4; Channel-forming tight junction protein that mediates paracellular chloride transport in the kidney.  Claudins play a major role in tight junction-specific obliteration of the intercellular space, through calcium-independent cell- adhesion activity. Retasked in M-cells, cf. Dillon 2019: ""tight junction proteins such as Claudin-4 are recruited to endosomes as part of the capture of luminal microparticles"". And in Mabbott 2013: ""A peptide derived from the C-terminal domain of the Clostridium perfringens enterotoxin binds to the external domain of claudin 4 and can mediate uptake by M cells in vivo.99, 100 Furthermore, this claudin 4–binding peptide when coupled to antigen is effective in enhancing mucosal antigen-specific secretory IgA responses after intranasal immunization.100"""
+Amot	TJ	2	0	0	"Angiomotin; Plays a central role in tight junction maintenance via the complex formed with ARHGAP17, which acts by regulating the uptake of polarity proteins at tight junctions."
+Amotl1	TJ	2	0	0	Angiomotin like. 
+Amotl2	TJ	2	0	0	Angiomotin like. 
+Cgn	TJ	2	0	0	Cingulin; Probably plays a role in the formation and regulation of the tight junction (TJ) paracellular permeability barrier; Belongs to the cingulin family
+Cgnl1	TJ	2	0	0	"Cingulin-like protein 1; May be involved in anchoring the apical junctional complex, especially tight junctions, to actin-based cytoskeletons; Belongs to the cingulin family"
+Ezr	TJ	2	0	0	Ezrin. Anchoring cytoskeleton to apical junctions. 
+F11r	TJ	2	0	0	"Junctional adhesion molecule A; Seems to play a role in epithelial tight junction formation. Appears early in primordial forms of cell junctions and recruits PARD3. The association of the PARD6- PARD3 complex may prevent the interaction of PARD3 with JAM1, thereby preventing tight junction assembly."
+Mpzl3	TJ	2	0	0	Myelin protein zero-like protein 3; Mediates homophilic cell-cell adhesion. Interacts with regulators of tight junctions. 
+Tjp2	TJ	2	0	0	Tight junction protein ZO-2
+Tacstd2	TJ	2	0	3	"Interacts with claudins, regulates tight junctions. Analogous to Epcam, involved in cell-cell adhesion. Transmembrane protein mediating calcium signaling. https://iovs.arvojournals.org/article.aspx?articleid=2373266. Fetal/regenerative marker, Yui 2018. "
+Anxa5	Immune	3	2	3	"Canonical immature M-cell Marker. Can bind to Gram-negative bacteria with high affinity via the lipid A domain of lipopolysaccharide (LPS). Mabbott 2013. Involved in endocytic transport and membrane scaffolding as reviewed by Nakato 2009. Fetal/regenerative Marker, Yui 2018."
+Prnp	Immune	3	0	0	"Bacterial sampling, highly expressed on M-cells Nakato 2009. "
+Cd14	Immune	2	0	0	LPS co-receptor with TLR2/4 and others. Shown to be expressed in intestinal epithelial cells by Funda 2001. 
+Cxcl16	Immune/YAP	3	0	0	"Terahara 2008: enriched particularly in villous M-cells (not so much in Peyer's patch M-cells, and we don't have enrichment of the genes in Peyer's patch M-cells such as Cxcl13). The membrane-bound chemokine CXCL16 expressed on follicle-associated epithelium and M cells mediates lympho-epithelial interaction in gut associated lymphoid tissue, Hase 2006. YAP target according to Roulis 2020, probably based on Kim 2016 even though I don't find a reference to anything about this claim. "
+Il18r1	Immune	0	0	0	
+Il18rap	Immune	0	0	0	
+Il18	Immune	0	0	0	
+Ctla2a	Immune/GF	0	0	0	Cytotoxic T lymphocyte associated
+Tgfbr2	Immune	0	0	0	
+Traf3	Immune	2	0	0	"Trafs are upstream of the NFkB pathway, linking it to TNF signaling, IL17, and CD14/TLR4. Also interact with other receptors and pathways. "
+Traf4	Immune	2	0	0	"Trafs are upstream of the NFkB pathway, linking it to TNF signaling, IL17, and CD14/TLR4. Also interact with other receptors and pathways. "
+Pigr	Immune	1	0	0	"Transporter of IgA antibodies through the epithelium. Negative marker of FAE/M-cells (downregulated in FAE), as discovered by Bjerke 1988 and reminded in Nakamura 2018."
+Mucins	Immune	1	0	0	FAE-associated epithelium is low on mucins/mucus to facilitate antigen uptake. 
+Bdnf	GF	0	0	0	"Was a surprise to find, but recent paper shows axons associate with PP M-cells (https://www.sciencedirect.com/science/article/pii/S009286741931270X#fig5)"
+Wnt7a	GF	0	0	0	
+Wnt7b	GF	0	0	0	
+Ptgs2	PG/YAP	0	0	0	"COX2, prostaglandin production (PGH2, intermediate to PGD2, PGE2, PGI2). Itself a YAP target gene according to the YAP target genes ref. "
+Ptgfrn	PG	0	0	0	Prostaglandin F2 receptor
+S100a6	PG	0	0	0	PG regulation. See e.g. https://pathcards.genecards.org/card/prostaglandin_synthesis_and_regulation. 
+S100a10	PG	0	0	0	PG regulation. See e.g. https://pathcards.genecards.org/card/prostaglandin_synthesis_and_regulation. 
+Anxa1	PG	2	3	3	"DNA damage response. RSCs marker according to Ayyaz 2019. Regulatin PG pathways according to DOI: 10.1007/s00011-003-1235-z. Fetal/regenerative Marker, Yui 2018."
+Anxa3	PG	2	3	3	"PG regulation. See e.g. https://pathcards.genecards.org/card/prostaglandin_synthesis_and_regulation. RSC marker Ayyaz 2019. Fetal/regenerative Marker, Yui 2018."
+Lama3	Matrix	0	2	0	Basement membrane deposition. 
+Lamb3	Matrix	0	2	0	Basement membrane deposition. 
+Lamc2	Matrix	0	3	0	Basement membrane deposition. Also an RSC marker according to Ayyaz 2019.
+Col4a1	Matrix	0	2	0	Basement membrane deposition. 
+Col4a2	Matrix	0	2	0	Basement membrane deposition. 
+Fn1	Matrix	0	0	0	Fibronectin 1.
+Npnt	Matrix	0	0	0	"Nephronectin, ligand for Itgn a8/b1."
+Agrn	Matrix	0	0	0	Binds to laminin and AchR. Usually associated with NMJ
+Npnt	Matrix	0	0	0	"Nephronectin, ligand for Itgn a8/b1"
+Serpine1	Matrix	0	0	0	"Plasminogen Activator Inhibitor, Type I."
+Mmp14	Matrix	3	0	0	Hase 2005 enriched in FAE.
+Mmp15	Matrix	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. "
+Epha2	Morphogens	0	0	0	
+Epha4	Morphogens	0	0	0	
+Sema3c	Morphogens	0	0	0	Attract enteric nervous system https://www.ncbi.nlm.nih.gov/pmc/articles/PMC4385176/
+Nrp1	Morphogens	0	0	0	
+Plxna1	Morphogens	0	0	0	
+Itga2	Adhesion	0	0	0	
+Itga3	Adhesion	0	0	0	
+Itgav	Adhesion	0	0	0	
+Itgb1	Adhesion	3	0	0	Iba1 cooperates with Itgb1 for activation and uptake of some pathogens such as Yersinia (Nakamura 2018).
+Itgb6	Adhesion	0	0	0	
+Agrn	Adhesion	0	0	0	
+Epb41l2	Cytoskeleton	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. Actin and spectrin binding, cytoskeletal organization. "
+Marcksl1	Cytoskeleton/TF	3	2	0	Canonical M-cell Marker Mabbott 2013. Regulating actin cytoskeleton homeostasis and filopodium and lamellipodium formation. Regulates adherens junction formation. Can also act as a TF. Hartl 2019
+Basp1	Cytoskeleton/TF	2	3	0	"RSCs marker according to Ayyaz 2019. Similarities with Marcksl1 and Gap43, calcium (PKC and CaM) regulated, interact with the cytoskeleton and regulate gene expression. Hartl 2019"
+Aif1l	Cytoskeleton	2	0	0	"Actin bundling. Also known as Iba2, and closely related to Aif1 (Iba1), used as an activated macrophage marker. Iba1 cooperates with Itgb1 for activation and uptake of some pathogens such as Yersinia (Nakamura 2018)."
+Krt7	Cytoskeleton	0	0	0	
+Krt23	Cytoskeleton	0	0	0	
+Actn1	Cytoskeleton	3	0	0	"Hase 2005 enriched in FAE. Nakato 2009 enriched in FAE. Actinin alpha 1, anchoring actin to adherens junctions and other structures. "
+Flna	Cytoskeleton	0	0	0	"Filamin. Actin binding. Involved in TGFb/SMAD pathway, HGF/cMET pathway, mTOR, mechanosensing. "
+Flnb	Cytoskeleton	0	0	0	"Filamin. Actin binding. Involved in TGFb/SMAD pathway, HGF/cMET pathway, mTOR, mechanosensing. "
+Myo1c	Cytoskeleton	0	0	0	"Unconventional myosin. Various isoforms. Can be involved in transcription, translation, vesicle targeting/transport, membrane anchoring. "
+Myo1e	Cytoskeleton	0	0	0	"Also expressed in Enteroendocrine/Tuft cells, and to a lower extent in stem cells. Required for normal morphology of the glomerular basement membrane, normal development of foot processes by kidney podocytes and normal kidney function. "
+Rela	NFkB	2	0	0	NFkB component. 
+Relb	NFkB	3	0	0	"Expected to be up in the whole FAE cf. Dillon 2019, attributed to TNF-like cytokines. We rather have Rela markedly up in this dataset. "
+Notch2	NFkB	2	0	0	NFkB target gene according to Veerman 2019.
+Spib	TF	3	0	0	"Is the major TF mediating RANKL-induced M-cell differentiation. Notoriously missing. Kanaya 2014, "
+Zmat3	TF	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. p53 target, DNA damage response. "
+Fhl2	TF	0	0	0	
+Ankrd1	TF	0	0	3	"Fetal/regenerative Marker, Yui 2018."
+Ctnnd1	TF	0	0	0	
+Wwtr1	TF	0	0	0	
+Nab1	TF	0	0	0	
+Amot	TF	0	0	0	
+Tnfaip3	TF	2	0	0	NFkB target gene according to Veerman 2019.
+Lrrfip1	TF	0	0	0	
+Pim1	TF	0	0	0	
+Med21	TF	0	0	0	
+Sorbs2	TF	0	0	0	
+Macc1	TF	0	0	0	
+Creb5	TF	0	0	0	
+Hdac7	TF	0	0	0	
+Ly6a	YAP	0	3	3	"Induced by Helminth infection and radiation damage. Stem cell marker (Sca-1). RSC marker in Ayyaz 2019. YAP target according to Roulis 2020. Collagen/injury induced, fetal like tissue, Yui 2018. "
+Clu	YAP	3	3	2	"RSCs marker according to Ayyaz 2019. Also M-cell marker according to Terahara 2008 and Nakato 2009, even though Nakato highlights it's in the whole FAE rather than MC only.. YAP target according to Roulis 2020 and Ayyaz 2019."
+Msln	YAP	3	3	2	"YAP target according to Roulis 2020. Lack of reference, but might be based on Ren 2011. M-cell marker according to Haber 2017. "
+Ctgf	YAP	2	2	2	"YAP signature genes according to Ayyaz 2019. Connective tissue growth factor, heparin binding. "
+Plaur	YAP	2	2	2	YAP signature genes according to Ayyaz 2019
+Cyr61	YAP	2	2	2	YAP signature genes according to Ayyaz 2019
+Mal	Other	3	0	0	"Myelin biogenesis and/or function. Highly hydrophobic fully transmembrane protein, organizing membrane domains. Hase 2005 enriched in FAE. "
+Cd44	Other	3	0	0	Hase 2005 enriched in FAE. Nakato 2009 enriched in FAE. 
+Cdkn2a	Other	3	0	0	"Codes for two proteins, p14arf and p16, that respectively activate p53 and inactivate Cdk4/Cdk6. Second most commonly mutated tumor suppressor gene after p53. p14 inhibits MDM2 and E2F pathways (cell proliferation, DNA synthesis). Loss of Cdkn2a ends up similar to loss of p53. p16 binds to Cdk4/6, prevents Rb phosphorylation, which leaves Rb associated with E2f1, preventing E2f1-mediated transcription, necessary for G1/S transition. arf in p14arf stands for alternative read frame. Made upon abnormal mitogenic stress, like aberrant Myc or Rac signaling. In mice, p19arf is the equivalent. p14 inhibits mdm2, loss of p14 leads to elevated mdm2, which induces p53 loss of function. Hase 2005 enriched in FAE. "
+S100a11	Other	3	0	0	Hase 2005 enriched in FAE.
+Ctsh	Other	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. Degradation of lysosomal proteins, aminopeptidase/endopeptidase. "
+Fabp5	Other	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. "
+Myadm	Other	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. Associated with myeloid differentiation, which is interesting considering the M-like cells express a number of myeloid markers, such as CD14, Cyba, and TLRs. "
+Cyba	Other	3	0	0	"Haber 2017 (atlas). Note that we miss most of their marker genes, but still reproduce a subset of them, supporting at most immature M-like cells. A cytochrome involved in superoxide production and phagocytosis. "
+Anxa10	Other	3	2	0	"Enriched in FAE Nakato 2009. Involved in the induction of PDX1 expression in GC, Ishikawa 2019."
+Gpr137b	Other	3	0	0	"Enriched in FAE Nakato 2009. The lysosomal GPCR-like protein GPR137B regulates Rag and mTORC1 localization and activity, Gan 2019. "
+Sacs	Other	3	0	0	Enriched in FAE Nakato 2009. Co-chaperone which acts as a regulator of the Hsp70 chaperone machinery and may be involved in the processing of other ataxia-linked proteins.
+Crct1	Other	0	0	0	"Expressed in eosophagal mucosa, otherwise not much known. Small protein, cysteine-rich c-terminal."
+Serpinb6b	Other	0	0	0	Inhibitor of Granzyme A (in mouse)
+Tnfrsf10b	Other	0	0	0	"TRAIL receptor, related pathways are Direct p53 effectors and CDK-mediated phosphorylation and removal of Cdc6."
+Tnfrsf12a	Other	3	0	0	"Hase 2005: enriched in follicle associated epithelium. TWEAK receptor, weak inducer of apoptosis, associated with inflammatory reactions. Interacts with many pathways including canonical and non-canonical NFkB, p44/p42 MAPK, JNK, AP-1. "
+Tnfrsf23	Other	0	0	0	
+Piezo1	Other	0	0	0	Mechanosensing
+Cxadr	Other	0	3	0	"A canonical RSC marker according to Ayyaz 2019, that is not enriched in our M-like cells but rather ubiquitously expressed, even though it would even have been consistent with M-cell like phenotype of RSCs. Genecards: Essential for tight junction integrity. Also involved in transepithelial migration of leukocytes through adhesive interactions with JAML a transmembrane protein of the plasma membrane of leukocytes. The interaction between both receptors also mediates the activation of gamma-delta T-cells, a subpopulation of T-cells residing in epithelia and involved in tissue homeostasis and repair. Upon epithelial CXADR-binding, JAML induces downstream cell signaling events in gamma-delta T-cells through PI3-kinase and MAP kinases. It results in proliferation and production of cytokines and growth factors by T-cells that in turn stimulate epithelial tissues repair. "
+Areg	Other	0	3	0	"Amphiregulin, EGF signaling. RSC marker according to ayyaz 2019 but enriched in our enterocytes rather than M-cells. "
+Anxa8	Other	0	2	3	"This protein is an anticoagulant protein that acts as an indirect inhibitor of the thromboplastin-specific complex, which is involved in the blood coagulation cascade. Fetal/regenerative Marker, Yui 2018."
+					
+					
+References:					
+Ayyaz 2019	https://www.nature.com/articles/s41586-019-1154-y.pdf				
+Hase 2005	https://academic.oup.com/dnaresearch/article/12/2/127/360060				
+Terahara 2008	https://www.jimmunol.org/content/180/12/7840/tab-figures-data				
+Dillon 2019	https://www.frontiersin.org/articles/10.3389/fimmu.2019.01499/full				
+Hase 2006	https://www.ncbi.nlm.nih.gov/pubmed/16365394				
+Funda 2001	https://www.ncbi.nlm.nih.gov/pubmed/11349042				
+YAP target genes	https://clincancerres.aacrjournals.org/content/clincanres/suppl/2017/10/26/1078-0432.CCR-17-1778.DC1/185213_2_supp_4330188_lxrrdg.pdf				
+Roulis 2020	https://www.nature.com/articles/s41586-020-2166-3.pdf				
+Kim 2016	https://www.jci.org/articles/view/88486#sd				
+Ren 2011	https://www.jbc.org/content/286/14/11960.full				
+Haber 2017	A single cell survey of the small intestinal epithelium (atlas)				
+Lim 2009	https://www.sciencedirect.com/science/article/pii/S0006291X09021366				
+Mabbott 2013	doi:10.1038/mi.2013.30				
+Veerman 2019	https://www.cell.com/cell-reports/pdf/S2211-1247(19)30213-X.pdf				
+Nakato 2009	https://academic.oup.com/dnaresearch/article/16/4/227/392840				
+Nakamura 2018	https://inflammregen.biomedcentral.com/articles/10.1186/s41232-018-0072-y#ref-CR21				
+Bjerke 1988	https://www.ncbi.nlm.nih.gov/pmc/articles/PMC1541660/				
+Hase 2009	https://www.nature.com/articles/nature08529				
+Yui 2018	https://doi.org/10.1016/j.stem.2017.11.001				
+Hartl 2019	doi: 10.3389/fonc.2019.00289				
+Nusse 2018	DOI: 10.1038/s41586-018-0257-1				
+Kanaya 2014	doi: 10.12938/bmfh.33.91				
