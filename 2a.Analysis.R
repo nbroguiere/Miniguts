@@ -297,7 +297,7 @@ Microfold <- SubsetData(SO, ident.use = "Microfold", subset.raw = T)
 Microfold <- SetAllIdent(Microfold, id = "group")
 
 celltype <- c("enterocytes","ISC","Enteroendocrine","Goblet","Tuft","Paneth","Microfold","AllCells")
-target_folder <- "./CCA_Aligned_2/InterferonResponse/"
+target_folder <- "./InterferonResponse/"
 for(i in 1:length(celltype))
 {
   if(celltype[i]=="AllCells")
@@ -377,347 +377,124 @@ if(TRUE)
 CA <- "C2" # First condition to compare
 CB <- "C4" # Second condition to compare
 
-# # Interferon response genes for highlights in the plots: 
-# Ifa_resp <- c("Ifitm3","Ifi27","Ifi27l2b","Bst2","B2m","Lgals9","Tcim") #Most important genes
-# Ifa_resp <- c(Ifa_resp,"Ifnar1","Ddx58","Oasl1","Oasl2","Ifit3","Ifit3b") # Other Ifn receptors weakly expressed: "Ifnar2","Ifngr1","Ifngr2","IfnIr1"
-# Ifa_resp <- c(Ifa_resp,"Ifit1","Ifit2","Ifit3","Ifitm1","Ifitm2","Ifitm3","Oasl1","Oasl2") #
-# Ifa_resp <- unique(Ifa_resp)
-
-# # Alternatively, use the MSigDB/GSEA curated list (human), converted to mouse homologs with this db and HumanToMouseConversion script:
-# # http://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt
-# Ifa_resp <- read.table(file="./CCA_aligned/Interferon response/mm_GSEA_HALLMARK_INTERFERON_ALPHA_RESPONSE.txt",header=FALSE,quote="")
-# Ifa_resp <- data.frame(lapply(Ifa_resp, as.character), stringsAsFactors=FALSE)$V1
-
-# Use both my highlighted genes and the MSigDB interferon alpha hallmark response:
-Ifa_resp <- read.table(file="./CCA_aligned/Interferon response/mm_GSEA_HALLMARK_INTERFERON_ALPHA_RESPONSE.txt",header=FALSE,quote="")
+# Use both custom highlighted interferon related genes and the MSigDB interferon alpha hallmark response converted to mm based this db for conversion: http://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt
+Ifa_resp <- read.table(file="./Resources/mm_GSEA_HALLMARK_INTERFERON_ALPHA_RESPONSE.txt",header=FALSE,quote="")
 Ifa_resp <- data.frame(lapply(Ifa_resp, as.character), stringsAsFactors=FALSE)$V1
-Ifa_resp <- c(Ifa_resp,"Ifitm3","Ifi27","Ifi27l2b","Bst2","B2m","Lgals9","Tcim","Ifnar1","Ddx58","Oasl1","Oasl2","Ifit3","Ifit3b","Ifit1","Ifit2","Ifit3","Ifitm1","Ifitm2","Ifitm3","Oasl1","Oasl2")
+custom_Ifa_genes <- c("Ifitm3","Ifi27","Ifi27l2b","Bst2","B2m","Lgals9","Tcim","Ifnar1","Ddx58","Oasl1","Oasl2","Ifit3","Ifit3b","Ifit1","Ifit2","Ifit3","Ifitm1","Ifitm2","Ifitm3","Oasl1","Oasl2")
+Ifa_resp <- c(Ifa_resp,custom_Ifa_genes)
 
-if(FALSE) # For plotting by Z number vs log ratio. 
-{
-  avg.enterocytes <- log1p(AverageExpression(enterocytes, show.progress = FALSE))
-  avg.enterocytes$gene <- rownames(avg.enterocytes)
-  avg.enterocytes$LR <- avg.enterocytes[[CB]]-avg.enterocytes[[CA]] # LR for "log ratio"
-  tmp <- avg.enterocytes$LR[order(-avg.enterocytes$LR)]
-  names(tmp) <- rownames(avg.enterocytes[order(-avg.enterocytes$LR),])
-  enterocytes.top20 <- names(tmp[1:20])
-  enterocytes.bot20 <- names(tail(tmp,20))
-  std.enterocytes <- NULL
-  std.enterocytes$gene <- rownames(enterocytes@data)
-  std.enterocytes <- as.data.frame(std.enterocytes)
-  rownames(std.enterocytes) <- std.enterocytes$gene
-  for(c in c(CA,CB))
-  {
-    cells_tmp <- colnames(enterocytes@data)
-    cells_tmp <- cells_tmp[grep(paste("^",c,sep=""),cells_tmp)]
-    enterocytes_tmp <- expm1(enterocytes@data[,cells_tmp])
-    for(i in std.enterocytes$gene)
-    {
-      std.enterocytes[i,c] <- log1p(sd(enterocytes_tmp[i,]))
-    }
-  }
-  avg.enterocytes$ZN <- (avg.enterocytes[[CB]]-avg.enterocytes[[CA]])/sqrt(std.enterocytes[[CB]]+std.enterocytes[[CA]])
-  avg.enterocytes <- avg.enterocytes[!is.nan(avg.enterocytes$ZN),]
-  avg.enterocytes$ZN <- abs(avg.enterocytes$ZN)
-  
-  
-  avg.ISC <- log1p(AverageExpression(ISC, show.progress = FALSE))
-  avg.ISC$gene <- rownames(avg.ISC)
-  avg.ISC$LR <- avg.ISC[[CB]]-avg.ISC[[CA]] # LR for "log ratio"
-  tmp <- avg.ISC$LR[order(-avg.ISC$LR)]
-  names(tmp) <- rownames(avg.ISC[order(-avg.ISC$LR),])
-  ISC.top20 <- names(tmp[1:20])
-  ISC.bot20 <- names(tail(tmp,20))
-  std.ISC <- NULL
-  std.ISC$gene <- rownames(ISC@data)
-  std.ISC <- as.data.frame(std.ISC)
-  rownames(std.ISC) <- std.ISC$gene
-  for(c in c(CA,CB))
-  {
-    cells_tmp <- colnames(ISC@data)
-    cells_tmp <- cells_tmp[grep(paste("^",c,sep=""),cells_tmp)]
-    ISC_tmp <- expm1(ISC@data[,cells_tmp])
-    for(i in std.ISC$gene)
-    {
-      std.ISC[i,c] <- log1p(sd(ISC_tmp[i,]))
-    }
-  }
-  avg.ISC$ZN <- (avg.ISC[[CB]]-avg.ISC[[CA]])/sqrt(std.ISC[[CB]]+std.ISC[[CA]])
-  avg.ISC <- avg.ISC[!is.nan(avg.ISC$ZN),]
-  avg.ISC$ZN <- abs(avg.ISC$ZN)
-  
-  
-  avg.Enteroendocrine <- log1p(AverageExpression(Enteroendocrine, show.progress = FALSE))
-  avg.Enteroendocrine$gene <- rownames(avg.Enteroendocrine)
-  avg.Enteroendocrine$LR <- avg.Enteroendocrine[[CB]]-avg.Enteroendocrine[[CA]] # LR for "log ratio"
-  tmp <- avg.Enteroendocrine$LR[order(-avg.Enteroendocrine$LR)]
-  names(tmp) <- rownames(avg.Enteroendocrine[order(-avg.Enteroendocrine$LR),])
-  Enteroendocrine.top20 <- names(tmp[1:20])
-  Enteroendocrine.bot20 <- names(tail(tmp,20))
-  std.Enteroendocrine <- NULL
-  std.Enteroendocrine$gene <- rownames(Enteroendocrine@data)
-  std.Enteroendocrine <- as.data.frame(std.Enteroendocrine)
-  rownames(std.Enteroendocrine) <- std.Enteroendocrine$gene
-  for(c in c(CA,CB))
-  {
-    cells_tmp <- colnames(Enteroendocrine@data)
-    cells_tmp <- cells_tmp[grep(paste("^",c,sep=""),cells_tmp)]
-    Enteroendocrine_tmp <- expm1(Enteroendocrine@data[,cells_tmp])
-    for(i in std.Enteroendocrine$gene)
-    {
-      std.Enteroendocrine[i,c] <- log1p(sd(Enteroendocrine_tmp[i,]))
-    }
-  }
-  avg.Enteroendocrine$ZN <- (avg.Enteroendocrine[[CB]]-avg.Enteroendocrine[[CA]])/sqrt(std.Enteroendocrine[[CB]]+std.Enteroendocrine[[CA]])
-  avg.Enteroendocrine <- avg.Enteroendocrine[!is.nan(avg.Enteroendocrine$ZN),]
-  avg.Enteroendocrine$ZN <- abs(avg.Enteroendocrine$ZN)
-  
-  
-  avg.Goblet <- log1p(AverageExpression(Goblet, show.progress = FALSE))
-  avg.Goblet$gene <- rownames(avg.Goblet)
-  avg.Goblet$LR <- avg.Goblet[[CB]]-avg.Goblet[[CA]] # LR for "log ratio"
-  tmp <- avg.Goblet$LR[order(-avg.Goblet$LR)]
-  names(tmp) <- rownames(avg.Goblet[order(-avg.Goblet$LR),])
-  Goblet.top20 <- names(tmp[1:20])
-  Goblet.bot20 <- names(tail(tmp,20))
-  std.Goblet <- NULL
-  std.Goblet$gene <- rownames(Goblet@data)
-  std.Goblet <- as.data.frame(std.Goblet)
-  rownames(std.Goblet) <- std.Goblet$gene
-  for(c in c(CA,CB))
-  {
-    cells_tmp <- colnames(Goblet@data)
-    cells_tmp <- cells_tmp[grep(paste("^",c,sep=""),cells_tmp)]
-    Goblet_tmp <- expm1(Goblet@data[,cells_tmp])
-    for(i in std.Goblet$gene)
-    {
-      std.Goblet[i,c] <- log1p(sd(Goblet_tmp[i,]))
-    }
-  }
-  avg.Goblet$ZN <- (avg.Goblet[[CB]]-avg.Goblet[[CA]])/sqrt(std.Goblet[[CB]]+std.Goblet[[CA]])
-  avg.Goblet <- avg.Goblet[!is.nan(avg.Goblet$ZN),]
-  avg.Goblet$ZN <- abs(avg.Goblet$ZN)
-  
-  
-  avg.Tuft <- log1p(AverageExpression(Tuft, show.progress = FALSE))
-  avg.Tuft$gene <- rownames(avg.Tuft)
-  avg.Tuft$LR <- avg.Tuft[[CB]]-avg.Tuft[[CA]] # LR for "log ratio"
-  tmp <- avg.Tuft$LR[order(-avg.Tuft$LR)]
-  names(tmp) <- rownames(avg.Tuft[order(-avg.Tuft$LR),])
-  Tuft.top20 <- names(tmp[1:20])
-  Tuft.bot20 <- names(tail(tmp,20))
-  std.Tuft <- NULL
-  std.Tuft$gene <- rownames(Tuft@data)
-  std.Tuft <- as.data.frame(std.Tuft)
-  rownames(std.Tuft) <- std.Tuft$gene
-  for(c in c(CA,CB))
-  {
-    cells_tmp <- colnames(Tuft@data)
-    cells_tmp <- cells_tmp[grep(paste("^",c,sep=""),cells_tmp)]
-    Tuft_tmp <- expm1(Tuft@data[,cells_tmp])
-    for(i in std.Tuft$gene)
-    {
-      std.Tuft[i,c] <- log1p(sd(Tuft_tmp[i,]))
-    }
-  }
-  avg.Tuft$ZN <- (avg.Tuft[[CB]]-avg.Tuft[[CA]])/sqrt(std.Tuft[[CB]]+std.Tuft[[CA]])
-  avg.Tuft <- avg.Tuft[!is.nan(avg.Tuft$ZN),]
-  avg.Tuft$ZN <- abs(avg.Tuft$ZN)
-  
-  avg.Paneth <- log1p(AverageExpression(Paneth, show.progress = FALSE))
-  avg.Paneth$gene <- rownames(avg.Paneth)
-  avg.Paneth$LR <- avg.Paneth[[CB]]-avg.Paneth[[CA]] # LR for "log ratio"
-  tmp <- avg.Paneth$LR[order(-avg.Paneth$LR)]
-  names(tmp) <- rownames(avg.Paneth[order(-avg.Paneth$LR),])
-  Paneth.top20 <- names(tmp[1:20])
-  Paneth.bot20 <- names(tail(tmp,20))
-  std.Paneth <- NULL
-  std.Paneth$gene <- rownames(Paneth@data)
-  std.Paneth <- as.data.frame(std.Paneth)
-  rownames(std.Paneth) <- std.Paneth$gene
-  for(c in c(CA,CB))
-  {
-    cells_tmp <- colnames(Paneth@data)
-    cells_tmp <- cells_tmp[grep(paste("^",c,sep=""),cells_tmp)]
-    Paneth_tmp <- expm1(Paneth@data[,cells_tmp])
-    for(i in std.Paneth$gene)
-    {
-      std.Paneth[i,c] <- log1p(sd(Paneth_tmp[i,]))
-    }
-  }
-  avg.Paneth$ZN <- (avg.Paneth[[CB]]-avg.Paneth[[CA]])/sqrt(std.Paneth[[CB]]+std.Paneth[[CA]])
-  avg.Paneth <- avg.Paneth[!is.nan(avg.Paneth$ZN),]
-  avg.Paneth$ZN <- abs(avg.Paneth$ZN)
-  
-  ## Plots in Z number vs log ratio, with interferon response genes highlighted:
-  p1 <- ggplot(avg.enterocytes,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Enterocytes")
-  p1 <- LabelUL(p1, genes = Ifa_resp, avg.enterocytes[Ifa_resp,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p2 <- ggplot(avg.ISC,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("ISC")
-  p2 <- LabelUL(p2, genes = Ifa_resp, avg.ISC[Ifa_resp,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p3 <- ggplot(avg.Enteroendocrine,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Enteroendocrine")
-  p3 <- LabelUL(p3, genes = Ifa_resp, avg.Enteroendocrine[Ifa_resp,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p4 <- ggplot(avg.Goblet,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Goblet")
-  p4 <- LabelUL(p4, genes = Ifa_resp, avg.Goblet[Ifa_resp,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p5 <- ggplot(avg.Tuft,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Tuft")
-  p5 <- LabelUL(p5, genes = Ifa_resp, avg.Tuft[Ifa_resp,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p6 <- ggplot(avg.Paneth,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Paneth")
-  p6 <- LabelUL(p6, genes = Ifa_resp, avg.Paneth[Ifa_resp,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  plot_grid(p1,p2,p3,p4,p5,p6)
-  
-  
-  ### Plots in Z number of CB/CA versus log ratio of expression of CB/CA: 
-  p1 <- ggplot(avg.enterocytes,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Enterocytes")
-  p1 <- LabelUL(p1, genes = enterocytes.top20, avg.enterocytes[enterocytes.top20,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p1 <- LabelUL(p1, genes = enterocytes.bot20, avg.enterocytes[enterocytes.bot20,c("LR","ZN","gene")],adj.u.t = -0.035,adj.l.t = 0.035,adj.u.s = -0.02,adj.l.s = 0.02)
-  p2 <- ggplot(avg.ISC,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("ISC")
-  p2 <- LabelUL(p2, genes = ISC.top20, avg.ISC[ISC.top20,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p2 <- LabelUL(p2, genes = ISC.bot20, avg.ISC[ISC.bot20,c("LR","ZN","gene")],adj.u.t = -0.035,adj.l.t = 0.035,adj.u.s = -0.02,adj.l.s = 0.02)
-  p3 <- ggplot(avg.Enteroendocrine,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Enteroendocrine")
-  p3 <- LabelUL(p3, genes = Enteroendocrine.top20, avg.Enteroendocrine[Enteroendocrine.top20,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p3 <- LabelUL(p3, genes = Enteroendocrine.bot20, avg.Enteroendocrine[Enteroendocrine.bot20,c("LR","ZN","gene")],adj.u.t = -0.035,adj.l.t = 0.035,adj.u.s = -0.02,adj.l.s = 0.02)
-  p4 <- ggplot(avg.Goblet,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Goblet")
-  p4 <- LabelUL(p4, genes = Goblet.top20, avg.Goblet[Goblet.top20,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p4 <- LabelUL(p4, genes = Goblet.bot20, avg.Goblet[Goblet.bot20,c("LR","ZN","gene")],adj.u.t = -0.035,adj.l.t = 0.035,adj.u.s = -0.02,adj.l.s = 0.02)
-  p5 <- ggplot(avg.Tuft,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Tuft")
-  p5 <- LabelUL(p5, genes = Tuft.top20, avg.Tuft[Tuft.top20,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p5 <- LabelUL(p5, genes = Tuft.bot20, avg.Tuft[Tuft.bot20,c("LR","ZN","gene")],adj.u.t = -0.035,adj.l.t = 0.035,adj.u.s = -0.02,adj.l.s = 0.02)
-  p6 <- ggplot(avg.Paneth,aes_string("LR", "ZN")) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Paneth")
-  p6 <- LabelUL(p6, genes = Paneth.top20, avg.Paneth[Paneth.top20,c("LR","ZN","gene")],adj.u.t = 0.035,adj.l.t = -0.035,adj.u.s = 0.02,adj.l.s = -0.02)
-  p6 <- LabelUL(p6, genes = Paneth.bot20, avg.Paneth[Paneth.bot20,c("LR","ZN","gene")],adj.u.t = -0.035,adj.l.t = 0.035,adj.u.s = -0.02,adj.l.s = 0.02)
-  plot_grid(p1,p2,p3,p4,p5,p6)
-  
-  ### Plots in expression of CB versus expression of CA: 
-  # genes.to.label = c("Ifi44l","Oasl1","Oasl2","Iscl5","Ifit1","Ifi6","Tnf","Wnt7a","Fgf2","Cbx2","E2f8","Neurl3")
-  # genes.to.label = intersect(genes.to.label,genes)
-  p1 <- ggplot(avg.enterocytes,aes_string(CA, CB)) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Enterocytes")
-  p1 <- LabelUL(p1, genes = enterocytes.top20, avg.enterocytes[enterocytes.top20,c(CA,CB,"gene")])
-  p1 <- LabelUR(p1, genes = enterocytes.bot20, avg.enterocytes[enterocytes.bot20,c(CA,CB,"gene")])
-  p2 <- ggplot(avg.ISC, aes_string(CA, CB)) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("ISC")
-  p2 <- LabelUL(p2, genes = ISC.top20, avg.ISC[,c(CA,CB,"gene")])
-  p2 <- LabelUR(p2, genes = ISC.bot20, avg.ISC[,c(CA,CB,"gene")])
-  p3 <- ggplot(avg.Enteroendocrine, aes_string(CA, CB)) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Enteroendocrine")
-  p3 <- LabelUL(p3, genes = Enteroendocrine.top20, avg.Enteroendocrine[,c(CA,CB,"gene")])
-  p3 <- LabelUR(p3, genes = Enteroendocrine.bot20, avg.Enteroendocrine[,c(CA,CB,"gene")])
-  p4 <- ggplot(avg.Goblet, aes_string(CA, CB)) + geom_point(colour="blue",alpha=1/10,size=0.2) + ggtitle("Goblet")
-  p4 <- LabelUL(p4, genes = Goblet.top20, avg.Goblet[,c(CA,CB,"gene")])
-  p4 <- LabelUR(p4, genes = Goblet.bot20, avg.Goblet[,c(CA,CB,"gene")])
-  plot_grid(p1,p2,p3,p4)
-}
+# For plotting volcano plots (-log(Pvalue) vs log ratio)
+p_val_thresh <- 0.05
+LR_thresh <- log(1.25) # Used 1.5 for paper
 
-if(TRUE) # For plotting volcano plots (-log(Pvalue) vs log ratio)
-{
-  p_val_thresh <- 0.05
-  LR_thresh <- log(1.25) # Used 1.5 for paper
-  
-  enterocytes_markers <- FindMarkers(enterocytes,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  enterocytes_markers$p_val_mlog10 <- -log10(enterocytes_markers$p_val)
-  enterocytes_markers$genes <- rownames(enterocytes_markers)
-  enterocytes_markers_significant <- enterocytes_markers[enterocytes_markers$p_val<p_val_thresh & enterocytes_markers$avg_logFC>LR_thresh,]
-  enterocytes_markers_significant_down <- enterocytes_markers[enterocytes_markers$p_val<p_val_thresh & enterocytes_markers$avg_logFC<(-LR_thresh),];
-  
-  ISC_markers <- FindMarkers(ISC,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  ISC_markers$p_val_mlog10 <- -log10(ISC_markers$p_val)
-  ISC_markers$genes <- rownames(ISC_markers)
-  ISC_markers_significant <- ISC_markers[ISC_markers$p_val<p_val_thresh & ISC_markers$avg_logFC>LR_thresh,]
-  ISC_markers_significant_down <- ISC_markers[ISC_markers$p_val<p_val_thresh & ISC_markers$avg_logFC<(-LR_thresh),]
-  
-  Enteroendocrine_markers <- FindMarkers(Enteroendocrine,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  Enteroendocrine_markers$p_val_mlog10 <- -log10(Enteroendocrine_markers$p_val)
-  Enteroendocrine_markers$genes <- rownames(Enteroendocrine_markers)
-  Enteroendocrine_markers_significant <- Enteroendocrine_markers[Enteroendocrine_markers$p_val<p_val_thresh & Enteroendocrine_markers$avg_logFC>LR_thresh,]
-  Enteroendocrine_markers_significant_down <- Enteroendocrine_markers[Enteroendocrine_markers$p_val<p_val_thresh & Enteroendocrine_markers$avg_logFC<(-LR_thresh),]
-  
-  Goblet_markers <- FindMarkers(Goblet,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  Goblet_markers$p_val_mlog10 <- -log10(Goblet_markers$p_val)
-  Goblet_markers$genes <- rownames(Goblet_markers)
-  Goblet_markers_significant <- Goblet_markers[Goblet_markers$p_val<p_val_thresh & Goblet_markers$avg_logFC>LR_thresh,]
-  Goblet_markers_significant_down <- Goblet_markers[Goblet_markers$p_val<p_val_thresh & Goblet_markers$avg_logFC<(-LR_thresh),]
-  
-  Tuft_markers <- FindMarkers(Tuft,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  Tuft_markers$p_val_mlog10 <- -log10(Tuft_markers$p_val)
-  Tuft_markers$genes <- rownames(Tuft_markers)
-  Tuft_markers_significant <- Tuft_markers[Tuft_markers$p_val<p_val_thresh & Tuft_markers$avg_logFC>LR_thresh,]
-  Tuft_markers_significant_down <- Tuft_markers[Tuft_markers$p_val<p_val_thresh & Tuft_markers$avg_logFC<(-LR_thresh),]
-  
-  Paneth_markers <- FindMarkers(Paneth,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  Paneth_markers$p_val_mlog10 <- -log10(Paneth_markers$p_val)
-  Paneth_markers$genes <- rownames(Paneth_markers)
-  Paneth_markers_significant <- Paneth_markers[Paneth_markers$p_val<p_val_thresh & Paneth_markers$avg_logFC>LR_thresh,]
-  Paneth_markers_significant_down <- Paneth_markers[Paneth_markers$p_val<p_val_thresh & Paneth_markers$avg_logFC<(-LR_thresh),]
-  
-  Microfold_markers <- FindMarkers(Microfold,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
-  Microfold_markers$p_val_mlog10 <- -log10(Microfold_markers$p_val)
-  Microfold_markers$genes <- rownames(Microfold_markers)
-  Microfold_markers_significant <- Microfold_markers[Microfold_markers$p_val<p_val_thresh & Microfold_markers$avg_logFC>LR_thresh,]
-  Microfold_markers_significant_down <- Microfold_markers[Microfold_markers$p_val<p_val_thresh & Microfold_markers$avg_logFC<(-LR_thresh),]
-  
-  p1 <- ggplot(enterocytes_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Enterocytes")
-  p1 <- p1 + geom_point(colour="red",alpha=1/10,size=1)
-  p1 <- p1 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(enterocytes_markers_significant))
-  p1 <- LabelULRed(p1, genes = gtmp, enterocytes_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(enterocytes_markers_significant$genes,gtmp)
-  #p1 <- LabelUL(p1, genes = gtmp, enterocytes_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  p2 <- ggplot(ISC_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("ISC and TA")
-  p2 <- p2 + geom_point(colour="red",alpha=1/10,size=1)
-  p2 <- p2 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(ISC_markers_significant))
-  p2 <- LabelULRed(p2, genes = gtmp, ISC_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(ISC_markers_significant$genes,gtmp)
-  #p2 <- LabelUL(p2, genes = gtmp, ISC_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  p3 <- ggplot(Enteroendocrine_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Enteroendocrine")
-  p3 <- p3 + geom_point(colour="red",alpha=1/10,size=1)
-  p3 <- p3 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(Enteroendocrine_markers_significant))
-  p3 <- LabelULRed(p3, genes = gtmp, Enteroendocrine_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(Enteroendocrine_markers_significant$genes,gtmp)
-  #p3 <- LabelUL(p3, genes = gtmp, Enteroendocrine_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  p4 <- ggplot(Goblet_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Goblet cells")
-  p4 <- p4 + geom_point(colour="red",alpha=1/10,size=1)
-  p4 <- p4 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(Goblet_markers_significant))
-  p4 <- LabelULRed(p4, genes = gtmp, Goblet_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(Goblet_markers_significant$genes,gtmp)
-  #p4 <- LabelUL(p4, genes = gtmp, Goblet_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  p5 <- ggplot(Tuft_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Tuft cells")
-  p5 <- p5 + geom_point(colour="red",alpha=1/10,size=1)
-  p5 <- p5 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(Tuft_markers_significant))
-  p5 <- LabelULRed(p5, genes = gtmp, Tuft_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(Tuft_markers_significant$genes,gtmp)
-  #p5 <- LabelUL(p5, genes = gtmp, Tuft_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  p6 <- ggplot(Paneth_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Paneth cells")
-  p6 <- p6 + geom_point(colour="red",alpha=1/10,size=1)
-  p6 <- p6 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(Paneth_markers_significant))
-  p6 <- LabelULRed(p6, genes = gtmp, Paneth_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(Paneth_markers_significant$genes,gtmp)
-  #p6 <- LabelUL(p6, genes = gtmp, Paneth_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  p7 <- ggplot(Microfold_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Microfold cells")
-  p7 <- p7 + geom_point(colour="red",alpha=1/10,size=1)
-  p7 <- p7 + geom_point(colour="yellow",alpha=1/100,size=1)
-  gtmp <- intersect(Ifa_resp,rownames(Microfold_markers_significant))
-  p7 <- LabelULRed(p7, genes = gtmp, Microfold_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  #gtmp <- setdiff(Microfold_markers_significant$genes,gtmp)
-  #p7 <- LabelUL(p7, genes = gtmp, Microfold_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
-  
-  plot_grid(p1,p2,p3,p4,p5,p6)
-  
-  write.table(enterocytes_markers_significant, file="enterocytes_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-  write.table(ISC_markers_significant, file="ISC_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-  write.table(Enteroendocrine_markers_significant, file="Enteroendocrine_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-  write.table(Goblet_markers_significant, file="Goblet_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-  write.table(Tuft_markers_significant, file="Tuft_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-  write.table(Paneth_markers_significant, file="Paneth_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-  
-  writeClipboard(as.character(Paneth_markers$avg_logFC)) # For copy-pasting into excel sheet or databases like interferome and string-db for functional annotations
-}
+enterocytes_markers <- FindMarkers(enterocytes,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+enterocytes_markers$p_val_mlog10 <- -log10(enterocytes_markers$p_val)
+enterocytes_markers$genes <- rownames(enterocytes_markers)
+enterocytes_markers_significant <- enterocytes_markers[enterocytes_markers$p_val<p_val_thresh & enterocytes_markers$avg_logFC>LR_thresh,]
+enterocytes_markers_significant_down <- enterocytes_markers[enterocytes_markers$p_val<p_val_thresh & enterocytes_markers$avg_logFC<(-LR_thresh),];
+
+ISC_markers <- FindMarkers(ISC,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+ISC_markers$p_val_mlog10 <- -log10(ISC_markers$p_val)
+ISC_markers$genes <- rownames(ISC_markers)
+ISC_markers_significant <- ISC_markers[ISC_markers$p_val<p_val_thresh & ISC_markers$avg_logFC>LR_thresh,]
+ISC_markers_significant_down <- ISC_markers[ISC_markers$p_val<p_val_thresh & ISC_markers$avg_logFC<(-LR_thresh),]
+
+Enteroendocrine_markers <- FindMarkers(Enteroendocrine,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+Enteroendocrine_markers$p_val_mlog10 <- -log10(Enteroendocrine_markers$p_val)
+Enteroendocrine_markers$genes <- rownames(Enteroendocrine_markers)
+Enteroendocrine_markers_significant <- Enteroendocrine_markers[Enteroendocrine_markers$p_val<p_val_thresh & Enteroendocrine_markers$avg_logFC>LR_thresh,]
+Enteroendocrine_markers_significant_down <- Enteroendocrine_markers[Enteroendocrine_markers$p_val<p_val_thresh & Enteroendocrine_markers$avg_logFC<(-LR_thresh),]
+
+Goblet_markers <- FindMarkers(Goblet,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+Goblet_markers$p_val_mlog10 <- -log10(Goblet_markers$p_val)
+Goblet_markers$genes <- rownames(Goblet_markers)
+Goblet_markers_significant <- Goblet_markers[Goblet_markers$p_val<p_val_thresh & Goblet_markers$avg_logFC>LR_thresh,]
+Goblet_markers_significant_down <- Goblet_markers[Goblet_markers$p_val<p_val_thresh & Goblet_markers$avg_logFC<(-LR_thresh),]
+
+Tuft_markers <- FindMarkers(Tuft,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+Tuft_markers$p_val_mlog10 <- -log10(Tuft_markers$p_val)
+Tuft_markers$genes <- rownames(Tuft_markers)
+Tuft_markers_significant <- Tuft_markers[Tuft_markers$p_val<p_val_thresh & Tuft_markers$avg_logFC>LR_thresh,]
+Tuft_markers_significant_down <- Tuft_markers[Tuft_markers$p_val<p_val_thresh & Tuft_markers$avg_logFC<(-LR_thresh),]
+
+Paneth_markers <- FindMarkers(Paneth,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+Paneth_markers$p_val_mlog10 <- -log10(Paneth_markers$p_val)
+Paneth_markers$genes <- rownames(Paneth_markers)
+Paneth_markers_significant <- Paneth_markers[Paneth_markers$p_val<p_val_thresh & Paneth_markers$avg_logFC>LR_thresh,]
+Paneth_markers_significant_down <- Paneth_markers[Paneth_markers$p_val<p_val_thresh & Paneth_markers$avg_logFC<(-LR_thresh),]
+
+Microfold_markers <- FindMarkers(Microfold,ident.1=CB,ident.2=CA,logfc.threshold=0,test.use="wilcox",min.pct=0,min.cells.gene=1,min.cells.group=1)
+Microfold_markers$p_val_mlog10 <- -log10(Microfold_markers$p_val)
+Microfold_markers$genes <- rownames(Microfold_markers)
+Microfold_markers_significant <- Microfold_markers[Microfold_markers$p_val<p_val_thresh & Microfold_markers$avg_logFC>LR_thresh,]
+Microfold_markers_significant_down <- Microfold_markers[Microfold_markers$p_val<p_val_thresh & Microfold_markers$avg_logFC<(-LR_thresh),]
+
+p1 <- ggplot(enterocytes_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Enterocytes")
+p1 <- p1 + geom_point(colour="red",alpha=1/10,size=1)
+p1 <- p1 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(enterocytes_markers_significant))
+p1 <- LabelULRed(p1, genes = gtmp, enterocytes_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(enterocytes_markers_significant$genes,gtmp)
+#p1 <- LabelUL(p1, genes = gtmp, enterocytes_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+p2 <- ggplot(ISC_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("ISC and TA")
+p2 <- p2 + geom_point(colour="red",alpha=1/10,size=1)
+p2 <- p2 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(ISC_markers_significant))
+p2 <- LabelULRed(p2, genes = gtmp, ISC_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(ISC_markers_significant$genes,gtmp)
+#p2 <- LabelUL(p2, genes = gtmp, ISC_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+p3 <- ggplot(Enteroendocrine_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Enteroendocrine")
+p3 <- p3 + geom_point(colour="red",alpha=1/10,size=1)
+p3 <- p3 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(Enteroendocrine_markers_significant))
+p3 <- LabelULRed(p3, genes = gtmp, Enteroendocrine_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(Enteroendocrine_markers_significant$genes,gtmp)
+#p3 <- LabelUL(p3, genes = gtmp, Enteroendocrine_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+p4 <- ggplot(Goblet_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Goblet cells")
+p4 <- p4 + geom_point(colour="red",alpha=1/10,size=1)
+p4 <- p4 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(Goblet_markers_significant))
+p4 <- LabelULRed(p4, genes = gtmp, Goblet_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(Goblet_markers_significant$genes,gtmp)
+#p4 <- LabelUL(p4, genes = gtmp, Goblet_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+p5 <- ggplot(Tuft_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Tuft cells")
+p5 <- p5 + geom_point(colour="red",alpha=1/10,size=1)
+p5 <- p5 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(Tuft_markers_significant))
+p5 <- LabelULRed(p5, genes = gtmp, Tuft_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(Tuft_markers_significant$genes,gtmp)
+#p5 <- LabelUL(p5, genes = gtmp, Tuft_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+p6 <- ggplot(Paneth_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Paneth cells")
+p6 <- p6 + geom_point(colour="red",alpha=1/10,size=1)
+p6 <- p6 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(Paneth_markers_significant))
+p6 <- LabelULRed(p6, genes = gtmp, Paneth_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(Paneth_markers_significant$genes,gtmp)
+#p6 <- LabelUL(p6, genes = gtmp, Paneth_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+p7 <- ggplot(Microfold_markers,aes_string("avg_logFC", "p_val_mlog10")) + geom_point(colour="blue",alpha=1,size=1) + ggtitle("Microfold cells")
+p7 <- p7 + geom_point(colour="red",alpha=1/10,size=1)
+p7 <- p7 + geom_point(colour="yellow",alpha=1/100,size=1)
+gtmp <- intersect(Ifa_resp,rownames(Microfold_markers_significant))
+p7 <- LabelULRed(p7, genes = gtmp, Microfold_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+#gtmp <- setdiff(Microfold_markers_significant$genes,gtmp)
+#p7 <- LabelUL(p7, genes = gtmp, Microfold_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 0.2,adj.l.t = -0.2,adj.u.s = 0.075,adj.l.s = -0.075)
+
+plot_grid(p1,p2,p3,p4,p5,p6)
+
+write.table(enterocytes_markers_significant, file="enterocytes_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
+write.table(ISC_markers_significant, file="ISC_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
+write.table(Enteroendocrine_markers_significant, file="Enteroendocrine_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
+write.table(Goblet_markers_significant, file="Goblet_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
+write.table(Tuft_markers_significant, file="Tuft_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
+write.table(Paneth_markers_significant, file="Paneth_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
+
+writeClipboard(as.character(Paneth_markers$avg_logFC)) # For copy-pasting into excel sheet or databases like interferome and string-db for functional annotations
 
 # Similar analysis with all the cells pulled together:
 CA <- "C2" # First condition to compare
