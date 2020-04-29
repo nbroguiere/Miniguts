@@ -131,7 +131,7 @@ for(i in names(markers))
     markers_sign_tmp[[i]][[j]] <- markers_sign_tmp[[i]][[j]][markers_sign_tmp[[i]][[j]]$avg_logFC>log(1.25),]
   }
 }
-# For further filtering (for heatmap only, keep all genes for significant markers with genes_tmp <- genes)
+# For further filtering
 genes_tmp <- genes[-grep("^Rp",genes)] # Exclude ribosomal proteins
 gene_dropout_rate <- rowSums(as.matrix(SO@data[genes,]==0))/length(colnames(SO@data))
 genes_tmp <- intersect(genes_tmp,genes[gene_dropout_rate>0.25]) # Exclude genes which are not dropped out in at least 25% of the cells in the dataset

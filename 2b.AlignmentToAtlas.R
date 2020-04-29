@@ -39,7 +39,7 @@ SOH2 <- RunHarmony(object = SOH2, group.by.vars = c("dataset"), dims.use = dims.
 SOH2 <- RunUMAP(object = SOH2, reduction = "harmony", dims = dims.use)
 DimPlot(object = SOH2, reduction = "umap")
 SOH2 <- RunHarmony(object = SOH2, group.by.vars = c("orig.ident"), dims.use = dims.use, plot_convergence = T,reduction="harmony",reduction.save="harmony2")
-SOH2 <- RunUMAP(object = SOH2, reduction = "harmony2", dims = dims.use, reduction.name = "umap2",n.neighbors = 150, min.dist = 1, spread = 1,seed.use = 173)
+#SOH2 <- RunUMAP(object = SOH2, reduction = "harmony2", dims = dims.use, reduction.name = "umap2",n.neighbors = 150, min.dist = 1, spread = 1,seed.use = 173)
 SOH2 <- RunUMAP(object = SOH2, reduction = "harmony2", dims = dims.use, reduction.name = "umap2",n.neighbors = 150, min.dist = 1, spread = 1,seed.use = 700)
 DimPlot(object = SOH2, reduction = "umap2",group.by = "cell.type",pt.size=1) # Export 12x8
 DimPlot(object = SOH2, reduction = "umap2",group.by = "dataset",pt.size=1)
@@ -47,3 +47,7 @@ DimPlot(object = SOH2, reduction = "umap2",group.by = "orig.ident",pt.size=1)
 #SOH2@reductions$umap <- NULL # Might need to run this line of code if running into a bug of Seurat using umap instead of umap2 in the feature plot despite of the explicit request for umap2.
 FeaturePlot(object = SOH2, features = c("Lgr5","Lyz1","Tff3","Fabp1","Chga","Cdk1","Marcksl1","Ctgf","Anxa5"),reduction = "umap2", ncol = 3, dims = c(1,2),sort.cell = T)
 FeaturePlot(object = SOH2,features = tmp_markers,reduction = "umap2", ncol = 3, dims = c(1,2),sort.cell = T)
+
+# If one wants to go back to Seurat v2 to continue the main analysis:
+detach(package:Seurat, unload=TRUE)
+library(Seurat,lib.loc = path_Seuratv2)
