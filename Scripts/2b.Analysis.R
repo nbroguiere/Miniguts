@@ -1,4 +1,4 @@
-##### For exploration: Pick up one or two cluster to find DEGs between them / markers for user defined populations #####
+##### For manual exploration: Pick up one or two cluster to find DEGs between them / markers for user defined populations #####
 ident.backup <- SO@ident
 cluster.manual  <- DimPlot(SO,reduction.use = 'umap', do.identify=TRUE)
 cluster.manual2 <- DimPlot(SO,reduction.use = 'umap', do.identify=TRUE)
@@ -18,7 +18,7 @@ markers_sign <- markers[markers$p_val<0.05 & markers$avg_logFC>log(2),]
 # # To restore a previous ident:
 # tmp <- read.csv("./CustomPopulation.csv")
 # SO@ident <- as.factor(tmp$x)
-# names(SO@ident) <- names(ident_backup_groups)
+# names(SO@ident) <- SO@cell.names
 
 writeClipboard(rownames(markers_sign)) # Paste in e.g. stringdb or pantherdb.org for functional annotations
 writeClipboard(as.character(markers_sign$p_val)) # In case want to pick up the p-vals externally
@@ -28,8 +28,8 @@ writeClipboard(as.character(markers_sign$avg_logFC)) # Or the avglogFC
 markers <- FindMarkers(SO,ident.1="Enterocytes",ident.2="ISC",only.pos = TRUE)
 write.table(markers, file="CustomMarkers.tsv", sep='\t',quote=TRUE, row.names=TRUE)
 
-##### For exploration: Find and check features: ############
-# Type it the root of a gene family of interest, and possibly edit the cells to use to plot only on one or another dataset:
+##### For manual exploration: Find and check gene expressions on UMAP: ############
+# Type the root of a gene family of interest, and possibly edit the cells to use to plot only on one or another dataset:
 Feat <- "Muc" 
 tmp_markers <- grep(Feat,genes,value = T)
 tmp_markers
@@ -66,6 +66,7 @@ ident_tmp[ident_tmp=="C1"] <- "Organoids"
 SO@meta.data$simplified.ident <- factor(ident_tmp)
 VlnPlot(object=SubsetData(SO,cells.use = c(cells.C1,cells.C2,cells.C3)),features.plot = "top.genes",ident.include = c("Enterocytes","TopEnterocytes"),group.by = "simplified.ident")
 
+# Check that additionally, the enterocytes which up-regulate the villus-top genes simultaneously down-regulate the villus-bottom genes:
 SO@ident <- factor(SO@meta.data$cell.type)
 names(SO@ident) <- rownames(SO@meta.data)
 SO.tmp <- SubsetData(SO,ident.use = c("Enterocytes","TopEnterocytes"))
@@ -93,16 +94,16 @@ FeaturePlot(object=SO.atlas,features.plot = "defas.paneth",reduction.use = "umap
 tmp_markers=c(paste0("Lama",1:5),paste0("Lamb",1:3),paste0("Lamc",1:3),"Nid1","Nid2","Col4a1","Col4a2","Hspg2","Fn1")
 VlnPlot(object = SO, features.plot = intersect(tmp_markers,genes),y.max = 1.5,x.lab.rot = TRUE,size.x.use = 5, size.title.use = 9, point.size.use = 0.01,remove.legend = TRUE)
 
-# Check gene correlations:
+# For manual exploration: check gene correlations (note, doesn't look like much is the data is not magic-filtered to impute dropouts)
 GenePlot(object = SO, "Lgr5", "Bmi1") # color by identity
 ggplot(as.data.frame(t(as.matrix(SO@data)))) + geom_point(aes(x=Lama3, y=Lamb3, color=Lamc2))
 
 # Dot plots of highlighted genes of interest for the microfold-like cells:
-tmp_markers <- readLines(con="./Resources/Microfold_Highlights_v4.txt")
-Mucins <- grep("Muc",genes,value=T)
+tmp_markers <- readLines(con="../Resources/MlikeHighlights.txt")
+Mucins <- grep("Muc",genes,value=T) # Create a virtual gene for mucins in a temporary Seurat object to seamlessly include this sum of genes in the dot plot:
 SO <- AddMetaData(object = SO, metadata = colSums(as.matrix(SO@data[Mucins,])), col.name = "Mucins")
 SO.tmp <- SO
-SO.tmp@data <- rbind(SO.tmp@data,SO.tmp@meta.data$Mucins) # Create a virtual gene for mucins in a temporary Seurat object to seamlessly include this sum of genes in the dot plot. 
+SO.tmp@data <- rbind(SO.tmp@data,SO.tmp@meta.data$Mucins)
 rownames(SO.tmp@data) <- c(rownames(SO@data),"Mucins")
 DotPlot(object=SO.tmp,genes.plot = intersect(tmp_markers[length(tmp_markers):1],rownames(SO.tmp@data)), cols.use = c("lightgrey","red"),plot.legend = TRUE,col.min = 0,col.max = 1.5,x.lab.rot = TRUE) # Exported 25x3 inches
 rm(SO.tmp)
@@ -114,7 +115,7 @@ for(i in levels(SO@ident)) # i is the cell type for which we look for markers
 {
   for(j in setdiff(levels(SO@ident),c(i,"G2/M"))) # j is the cell type to which we compare. Do not compare any cells to G2/M. 
   {
-    if((i=="ISC" & j=="Paneth")|(i=="Enterocytes" & j=="TopEnterocytes")|(i=="Goblet" & j=="Paneth")){} # Do not compare ISC to Paneth, enterocytes to Top enterocytes, because of natural expected shared markers. 
+    if((i=="ISC" & j=="Paneth")|(i=="Enterocytes" & j=="TopEnterocytes")|(i=="Goblet" & j=="Paneth")){} # Do not compare ISC to Paneth, Goblet to Paneth, enterocytes to Top enterocytes, because of natural expected shared markers. 
     else
     {
       markers[[i]][[j]] <- FindMarkers(object = SO, ident.1 = i, ident.2 = j, print.bar = TRUE,only.pos = TRUE,logfc.threshold = 0.2)
@@ -136,7 +137,7 @@ genes_tmp <- genes[-grep("^Rp",genes)] # Exclude ribosomal proteins
 gene_dropout_rate <- rowSums(as.matrix(SO@data[genes,]==0))/length(colnames(SO@data))
 genes_tmp <- intersect(genes_tmp,genes[gene_dropout_rate>0.25]) # Exclude genes which are not dropped out in at least 25% of the cells in the dataset
 
-# Compute the minimal log FC compared to all other clusters, and maximal p-value. Currently use LogFC to pick the top genes for heatmap. 
+# Compute the minimal log FC compared to all other clusters, and maximal p-value. Uuse LogFC to pick the top genes for heatmap. 
 markers_sign <- NULL
 for(i in names(markers))
 {
@@ -188,7 +189,7 @@ for(i in levels(SO.atlas@ident))
 {
   for(j in setdiff(levels(SO.atlas@ident),c(i,"G2/M"))) # Do not compare any cells to G2/M. 
   {
-    if((i=="ISC" & j=="Paneth")|(i=="Goblet" & j=="Paneth")){} # Do not compare ISC to Paneth, because of natural expected shared markers.Do not compare Goblet to Paneth 
+    if((i=="ISC" & j=="Paneth")|(i=="Goblet" & j=="Paneth")){} # Do not compare ISC to Paneth and Goblet to Paneth, because of natural expected shared markers.
     else
     {
       markers[[i]][[j]] <- FindMarkers(object = SO.atlas, ident.1 = i, ident.2 = j, print.bar = TRUE,only.pos = TRUE,logfc.threshold = 0.2)
@@ -205,7 +206,6 @@ for(i in names(markers))
     markers_sign_tmp[[i]][[j]] <- markers_sign_tmp[[i]][[j]][markers_sign_tmp[[i]][[j]]$avg_logFC>log(1.25),]
   }
 }
-# For further filtering (for heatmap only, keep all genes for significant markers with genes_tmp <- genes)
 genes_tmp <- genes.atlas[-grep("^Rp",genes.atlas)] # Exclude ribosomal proteins
 gene_dropout_rate <- rowSums(as.matrix(SO.atlas@data[genes.atlas,]==0))/length(colnames(SO.atlas@data))
 genes_tmp <- intersect(genes_tmp,genes.atlas[gene_dropout_rate>0.25]) # Exclude genes which are not dropped out in at least 25% of the cells in the dataset
@@ -273,13 +273,15 @@ cells.2  <- rownames(tmp[order(-tmp[,2]),])
 cells.use.atlas <- c(cells.1,cells.12,cells.2)
 
 # Load the gene list from the in vitro work: 
-genes.use <- readLines("./Resources/HeatmapMarkerGeneListfromInVitro_noM.txt")
+genes.use <- readLines("../Resources/HeatmapMarkerGeneListfromInVitro_noM.txt")
 # Make the heatmap:
 DoHeatmap(object = SO.atlas, use.scaled = FALSE, genes.use = genes.use, slim.col.label = TRUE, remove.key = TRUE,col.low="red",col.mid="blue",col.high="yellow",draw.line = FALSE,title = NULL, cex.col = 5,cex.row = 6, group.label.loc = "top", group.label.rot = TRUE,group.cex = 10, assay.type = "RNA",do.plot = TRUE,cells.use = cells.use.atlas, disp.min = 0, disp.max = 5, group.spacing = 10)
 
 ##### Isolate cell types and prepare data for GSEA in Java standalone software #####
 # Documentation on:
 # http://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats
+
+target_folder <- "./"
 
 enterocytes <- SubsetData(SO, ident.use = c("Enterocytes","TopEnterocytes"), subset.raw = T)
 enterocytes <- SetAllIdent(enterocytes, id = "group")
@@ -297,7 +299,6 @@ Microfold <- SubsetData(SO, ident.use = "Microfold", subset.raw = T)
 Microfold <- SetAllIdent(Microfold, id = "group")
 
 celltype <- c("enterocytes","ISC","Enteroendocrine","Goblet","Tuft","Paneth","Microfold","AllCells")
-target_folder <- "./InterferonResponse/"
 for(i in 1:length(celltype))
 {
   if(celltype[i]=="AllCells")
@@ -313,8 +314,6 @@ for(i in 1:length(celltype))
   tmp2 <- matrix(data="na",nrow=nrow(tmp),ncol=1)
   tmp3 <- as.matrix(rownames(tmp))
   tmp <- cbind(tmp3,tmp2,tmp)
-  #tmp <- rbind(colnames(tmp),tmp)
-  #for .cgt files preface with: write.table(x=matrix(data=c("#1.2","",nrow(tmp),ncol(tmp)-2),nrow = 2,ncol=2,byrow = TRUE),file = paste(target_folder,filename,".txt",sep=""),append = FALSE,quote = FALSE,sep = "\t",row.names = FALSE,col.names = FALSE)
   write.table(x=t(as.matrix(c("NAME","Description",colnames(tmp)[3:length(colnames(tmp))]))),file = paste(target_folder,filename,".txt",sep=""),append = FALSE,quote = FALSE,sep = "\t",row.names = FALSE,col.names = FALSE)
   write.table(x=tmp,file = paste(target_folder,filename,".txt",sep=""),append = TRUE,quote = FALSE,sep = "\t",row.names = FALSE,col.names = FALSE)
   n_samples <- ncol(tmp)-2
@@ -377,8 +376,8 @@ if(TRUE)
 CA <- "C2" # First condition to compare
 CB <- "C4" # Second condition to compare
 
-# Use both custom highlighted interferon related genes and the MSigDB interferon alpha hallmark response converted to mm based this db for conversion: http://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt
-Ifa_resp <- read.table(file="./Resources/mm_GSEA_HALLMARK_INTERFERON_ALPHA_RESPONSE.txt",header=FALSE,quote="")
+# Use both custom highlighted interferon related genes and the MSigDB interferon alpha hallmark response contributed by Liberzon. Original is for human, converted to mouse (mm) based this db: http://www.informatics.jax.org/downloads/reports/HOM_MouseHumanSequence.rpt
+Ifa_resp <- read.table(file="../Resources/Liberzon_Ifna_response_mm.txt",header=FALSE,quote="")
 Ifa_resp <- data.frame(lapply(Ifa_resp, as.character), stringsAsFactors=FALSE)$V1
 custom_Ifa_genes <- c("Ifitm3","Ifi27","Ifi27l2b","Bst2","B2m","Lgals9","Tcim","Ifnar1","Ddx58","Oasl1","Oasl2","Ifit3","Ifit3b","Ifit1","Ifit2","Ifit3","Ifitm1","Ifitm2","Ifitm3","Oasl1","Oasl2")
 Ifa_resp <- c(Ifa_resp,custom_Ifa_genes)
@@ -494,9 +493,7 @@ write.table(Goblet_markers_significant, file="Goblet_markers_significant.tsv", s
 write.table(Tuft_markers_significant, file="Tuft_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
 write.table(Paneth_markers_significant, file="Paneth_markers_significant.tsv", sep='\t',quote=TRUE, row.names=TRUE)
 
-writeClipboard(as.character(Paneth_markers$avg_logFC)) # For copy-pasting into excel sheet or databases like interferome and string-db for functional annotations
-
-# Similar analysis with all the cells pulled together:
+# Similar analysis with all the cells pulled together rather than comparing by cell type:
 CA <- "C2" # First condition to compare
 CB <- "C4" # Second condition to compare
 
@@ -521,25 +518,4 @@ gtmp <- setdiff(all_cells_markers_significant$genes,gtmp)
 p7 <- LabelUL(p7, genes = gtmp, all_cells_markers[gtmp,c("avg_logFC", "p_val_mlog10","genes")],adj.u.t = 4,adj.l.t = -0.1,adj.u.s = 4,adj.l.s = -0.1)
 
 plot_grid(p7)
-writeClipboard(as.character(all_cells_markers$genes)) # For pasting in string-db for functional annotations
-
-#backup_C2vsC4 <- all_cells_markers
-#backup_C2vsC4_significant <- all_cells_markers_significant
-
-significant_genes_filtered <- setdiff(all_cells_markers_significant$genes,backup_C2vsC4_significant$genes)
-writeClipboard(as.character(backup_C2vsC4$avg_logFC)) # For pasting in string-db for functional annotations
-
-##### Find markers between treatments #####
-Compare_1 <- "C2 Paneth"
-Compare_2 <- "C4 Paneth"
-ident.backup <- SO@ident
-ident.manual <- ordered(paste(ident_backup_groups,ident_backup_clusters))
-names(ident.manual) <- names(ident.backup)
-SO@ident <- ident.manual
-DimPlot(SO,reduction.use = 'umap',pt.size=2)
-markers <- FindMarkers(SO,ident.1=Compare_1,ident.2=Compare_2,only.pos = FALSE,test.use="tobit")
-writeClipboard(rownames(markers)) # Paste in pantherdb.org for functional annotations
-SO@ident <- ident.backup
-
-write.table(markers, file="C2vsC4_Paneth_Markers_tobit.tsv", sep='\t',quote=TRUE, row.names=TRUE)
-
+writeClipboard(as.character(all_cells_markers_significant$genes)) # For pasting in string-db for functional annotations
