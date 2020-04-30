@@ -1,8 +1,10 @@
+##### Set paths #####
+setwd("C:/Users/nicki/Documents/PostDoc_LSCB/19-03-20 Datasets Mike/CleanedUpCodeForUpload/Scripts")
+path_Seuratv2 <- '../../Seuratv2' # Analysis was done in Seurat v2, and Seurat v3 is not backwards compatible so need a separate install of the old Seurat to keep running this code
+path.data <- '../Resources/raw_counts.tsv' # Download and unzip GSE148366_raw_counts.tsv.gz
+path.data.atlas <- 'C:/Users/nicki/Documents/PostDoc_LSCB/19-04-11 Single cell survey of mSI epithelium/GSE92332_atlas_UMIcounts.txt' # Haber 2017, in vivo atlas, download from GEO 
+
 ##### Library import #####
-path_Seuratv2 <- 'C:/Users/nicki/Documents/PostDoc_LSCB/19-03-20 Datasets Mike/Seuratv2'
-path.data <- 'C:/Users/nicki/Documents/PostDoc_LSCB/19-03-20 Datasets Mike/Reviews3/raw_counts.tsv'
-path.data.atlas <- 'C:/Users/nicki/Documents/PostDoc_LSCB/19-04-11 Single cell survey of mSI epithelium/GSE92332_atlas_UMIcounts.txt'
-setwd("C:/Users/nicki/Documents/PostDoc_LSCB/19-03-20 Datasets Mike/CleanedUpCodeForUpload")
 library(rPython)
 library(Matrix)
 library(Seurat,lib.loc = path_Seuratv2)
@@ -12,12 +14,12 @@ library(scRNAseq)
 library(DropletUtils)  # read10xCounts function
 library(matrixStats)
 library(magrittr)
-library(Rmagic)
 library(ggplot2)
-library(biomaRt)
-library(SCENIC)
-library(AUCell)
-library(Rtsne)
+#library(Rmagic)
+#library(biomaRt)
+#library(SCENIC)
+#library(AUCell)
+#library(Rtsne)
 library(reticulate)
 library(limma)
 library(ggeffects)
@@ -37,8 +39,8 @@ nGene.log        <- log10(SO.tmp@meta.data$nGene)
 names(nGene.log) <- rownames(SO.tmp@meta.data)
 nUMI.log         <- log10(SO.tmp@meta.data$nUMI)
 names(nUMI.log) <- rownames(SO.tmp@meta.data)
-hist(SO.tmp@meta.data$nGene,100,col="blue")  # Single live cells: # 2500 - 4700 # Previously: 3000-5000 but bad cluster so 3500-4700. Lose ChgA so
-hist(percent.mito,100,col="blue") # Live cells: 0.05-0.15
+hist(SO.tmp@meta.data$nGene,100,col="blue")
+hist(percent.mito,100,col="blue")
 hist(SO.tmp@meta.data$nUMI,200,col="blue")  # 
 SO.tmp <- AddMetaData(object = SO.tmp, metadata = percent.mito, col.name = "percent.mito")
 SO.tmp <- AddMetaData(object = SO.tmp, metadata = percent.mito.log, col.name = "percent.mito.log")
@@ -65,13 +67,13 @@ SO.atlas <- AddMetaData(object = SO.atlas, metadata = nUMI.log, col.name = "nUMI
 hist(SO.atlas@meta.data$nUMI.nGene.logRatio,200,col="blue")  # 
 ggplot(SO.atlas@meta.data) + geom_point(aes(x=nGene.log, y=nUMI.log, color=nUMI.log))
 SO.atlas <- NormalizeData(object = SO.atlas, normalization.method = "LogNormalize", scale.factor = 10000)
-SO.atlas <- SubsetData(SO.atlas, ident.use = paste0("B",2:10), subset.raw = F) # B1 to B10 are the various mice/datasets from Haber et al 2017. B1 has very strong technical differences, doesn't co-UMAP with the rest without alignment, exclude for simplicity. 
+SO.atlas <- SubsetData(SO.atlas, ident.use = paste0("B",2:10), subset.raw = F) # B1 to B10 are the various mice/datasets from Haber et al 2017. B1 has very strong technical differences, doesn't co-UMAP well with the rest without alignment, exclude for simplicity. 
 
 ##### Pick up the metadata from column names, especially cell type annotations #####
 Dataset_CellType_UniqueTag <- strsplit2(SO.tmp@cell.names,split="_")
 cell.type <- Dataset_CellType_UniqueTag[,2]
 cell.type[cell.type=="G2.M"] <- "G2/M"
-cell.type <- factor(cell.type, ordered = T, levels = c("ISC","G2/M","Enterocytes","TopEnterocytes","Microfold","Paneth","Goblet","Tuft","Enteroendocrine"))
+cell.type <- factor(cell.type, ordered = T, levels = c("ISC","G2/M","Enterocytes","TopEnterocytes","Microfold","Paneth","Goblet","Tuft","Enteroendocrine")) # ISC are the stem and progenitor, G2/M dividing cells, TopEnterocytes show analogies with Villus top enterocytes, Microfold are the RSC/Fetal like regenerative/M-like cells
 names(cell.type) <- SO.tmp@cell.names
 SO.tmp@meta.data$cell.type <- cell.type
 
@@ -162,10 +164,10 @@ tmp_cells <- c(cells.C1, cells.C2, cells.C3, cells.C4)
 FeaturePlot(object = SO, cells.use=tmp_cells, features.plot = intersect(tmp_markers,genes), cols.use = c("#EEEEEE", "#880EC9"), reduction.use = "umap",pt.size=1,no.axes = TRUE,no.legend = FALSE)
 
 ##### Gene set scoring, on merged in vitro datasets: Distal vs proximal enterocyte annotation and others e.g. microfold cells and defas #####
-# Immature enterocyte markers from Atlas. Top enterocytes from Cell 2018
-top_genes <- readLines(con="./Villi_top_landmark_genes.txt")
-bot_genes <- readLines(con="./Villi_bot_landmark_genes.txt")
-M_genes <- readLines(con="./Mcells_atlas_genes.txt")
+# Immature enterocyte markers from Haber 2017. Top enterocytes from Moor 2018.
+top_genes <- readLines(con="../Resources/Moor_Villi_top_landmark_genes.txt")
+bot_genes <- readLines(con="../Resources/Moor_Villi_bot_landmark_genes.txt")
+M_genes <- readLines(con="./Resources/Haber_Mcell_landark_genes.txt")
 top_genes <- intersect(top_genes,genes)
 bot_genes <- intersect(bot_genes,genes)
 M_genes <- intersect(M_genes,genes)
@@ -184,7 +186,7 @@ SO <- AddMetaData(object = SO, metadata = colSums(as.matrix(SO@data[M_genes_2,])
 FeaturePlot(object = SO, features.plot = c(M_genes_2), cols.use = c("#EEEEEE", "#880EC9"), reduction.use = "umap",pt.size=1, no.legend = FALSE)
 
 ##### Cell cycle annotations from cell cycle genes published by the Regev lab, converted to mm: ##### 
-cc.genes <- readLines(con="./Resources/cc_genes_mm.txt")
+cc.genes <- readLines(con="../Resources/Regev_cellcyclegenes_mm.txt")
 s.genes <- cc.genes[1:42]
 g2m.genes <- cc.genes[43:93]
 SO@var.genes <- union(SO@var.genes,intersect(cc.genes,rownames(SO@data)))  ## Other useful function: setdiff(a,b) returns elements of a not in b. 
@@ -221,7 +223,7 @@ SO.atlas@meta.data$orig.cell.type <- SO.atlas@ident
 DimPlot(SO.atlas,reduction.use = "umap")
 
 ##### Atlas cell cycle annotations #####
-cc.genes <- readLines(con="./Resources/cc_genes_mm.txt")
+cc.genes <- readLines(con="../Resources/Regev_cellcyclegenes_mm.txt")
 s.genes <- cc.genes[1:42]
 g2m.genes <- cc.genes[43:93]
 SO.atlas@var.genes <- union(SO.atlas@var.genes,intersect(cc.genes,rownames(SO.atlas@data)))
