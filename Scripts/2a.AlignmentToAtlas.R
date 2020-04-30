@@ -23,8 +23,8 @@ dims.use <- 1:30
 
 # From here on, switch to Seurat v3 (for compatibility with Harmony).
 detach(package:Seurat, unload=TRUE)
-library(Seurat)
-library(harmony)
+library(Seurat) # 3.1.1
+library(harmony) # 1.0
 SOH2 <- UpdateSeuratObject(SOH)
 
 tmp <- as.character(SOH2@meta.data$orig.ident)
@@ -45,8 +45,7 @@ DimPlot(object = SOH2, reduction = "umap2",group.by = "cell.type",pt.size=1) # E
 DimPlot(object = SOH2, reduction = "umap2",group.by = "dataset",pt.size=1)
 DimPlot(object = SOH2, reduction = "umap2",group.by = "orig.ident",pt.size=1)
 #SOH2@reductions$umap <- NULL # Might need to run this line of code if running into a bug of Seurat using umap instead of umap2 in the feature plot despite of the explicit request for umap2.
-FeaturePlot(object = SOH2, features = c("Lgr5","Lyz1","Tff3","Fabp1","Chga","Cdk1","Marcksl1","Ctgf","Anxa5"),reduction = "umap2", ncol = 3, dims = c(1,2),sort.cell = T)
-FeaturePlot(object = SOH2,features = tmp_markers,reduction = "umap2", ncol = 3, dims = c(1,2),sort.cell = T)
+FeaturePlot(object = SOH2, features = c("Lgr5","Lyz1","Tff3","Fabp1","Chga","Cdk1"),reduction = "umap2", ncol = 3, dims = c(1,2),sort.cell = T)
 
 # If one wants to go back to Seurat v2 to continue the main analysis:
 detach(package:Seurat, unload=TRUE)
